@@ -43,6 +43,7 @@ def _parsear_partido_footballdata(match: dict) -> dict:
     away = match.get("awayTeam", {})
     score = match.get("score", {})
     full_time = score.get("fullTime", {})
+    half_time = score.get("halfTime", {})
     status_raw = match.get("status", "SCHEDULED")
     status = STATUS_MAP.get(status_raw, status_raw)
 
@@ -61,6 +62,8 @@ def _parsear_partido_footballdata(match: dict) -> dict:
         "estado": status,
         "goles_local": full_time.get("home"),
         "goles_visitante": full_time.get("away"),
+        "goles_local_ht": half_time.get("home"),
+        "goles_visitante_ht": half_time.get("away"),
         "finalizado": status_raw == "FINISHED",
     }
 

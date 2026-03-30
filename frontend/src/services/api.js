@@ -5,12 +5,13 @@ const api = axios.create({
 })
 
 export const partidosApi = {
-  obtenerHoy: () => api.get('/partidos/hoy'),
-  obtenerPorFecha: (fecha, sincronizar = false) =>
-    api.get(`/partidos/fecha/${fecha}`, { params: { sincronizar } }),
+  obtenerHoy: (liga, pais) => api.get('/partidos/hoy', { params: { liga, pais } }),
+  obtenerPorFecha: (fecha, sincronizar = false, liga, pais) =>
+    api.get(`/partidos/fecha/${fecha}`, { params: { sincronizar, liga, pais } }),
   obtenerPorId: (apiId) => api.get(`/partidos/${apiId}`),
   obtenerResultado: (apiId) => api.get(`/partidos/${apiId}/resultado`),
   sincronizar: (fecha) => api.post(`/partidos/sincronizar/${fecha}`, null, { timeout: 60000 }),
+  obtenerLigas: () => api.get('/partidos/ligas'),
 }
 
 export const prediccionesApi = {

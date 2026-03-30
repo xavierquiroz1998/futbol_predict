@@ -320,6 +320,36 @@ export default function DetallePartido() {
               <BarraProbabilidad label="Empate" valor={pred.prob_empate} color="bg-yellow-500" />
               <BarraProbabilidad label={p.equipo_visitante_nombre} valor={pred.prob_visitante} color="bg-blue-500" />
 
+              {/* Predicciones adicionales */}
+              {(pred.marcador_pred || pred.over_under_pred || pred.btts_pred !== null) && (
+                <div className="mt-4 grid grid-cols-3 gap-3">
+                  {pred.marcador_pred && (
+                    <div className="bg-gray-700/50 rounded-lg p-3 text-center border border-gray-600">
+                      <p className="text-xs text-gray-400 mb-1">Marcador</p>
+                      <p className="text-2xl font-black text-white">{pred.marcador_pred}</p>
+                    </div>
+                  )}
+                  {pred.over_under_pred && (
+                    <div className="bg-gray-700/50 rounded-lg p-3 text-center border border-gray-600">
+                      <p className="text-xs text-gray-400 mb-1">Over/Under 2.5</p>
+                      <p className={`text-lg font-bold ${pred.over_under_pred === 'over' ? 'text-green-400' : 'text-red-400'}`}>
+                        {pred.over_under_pred === 'over' ? 'Over' : 'Under'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">{(pred.prob_over * 100).toFixed(0)}% / {(pred.prob_under * 100).toFixed(0)}%</p>
+                    </div>
+                  )}
+                  {pred.btts_pred !== null && (
+                    <div className="bg-gray-700/50 rounded-lg p-3 text-center border border-gray-600">
+                      <p className="text-xs text-gray-400 mb-1">Ambos anotan</p>
+                      <p className={`text-lg font-bold ${pred.btts_pred ? 'text-green-400' : 'text-red-400'}`}>
+                        {pred.btts_pred ? 'Si' : 'No'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">{(pred.prob_btts * 100).toFixed(0)}%</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {p.finalizado && pred.acertada === null && (
                 <button onClick={verificarPrediccion} disabled={verificando}
                   className="mt-4 w-full py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-700 disabled:opacity-50 transition-colors">

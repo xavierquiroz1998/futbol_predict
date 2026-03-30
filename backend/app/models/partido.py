@@ -36,10 +36,12 @@ class Partido(Base):
     equipo_visitante_logo: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     fecha: Mapped[datetime] = mapped_column(DateTime, index=True)
-    estado: Mapped[str] = mapped_column(String(20), default="NS")  # NS, 1H, 2H, FT, etc.
+    estado: Mapped[str] = mapped_column(String(20), default="NS")
 
     goles_local: Mapped[int | None] = mapped_column(Integer, nullable=True)
     goles_visitante: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    goles_local_ht: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    goles_visitante_ht: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     finalizado: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -54,6 +56,14 @@ class Prediccion(Base):
     prob_local: Mapped[float] = mapped_column(Float)
     prob_empate: Mapped[float] = mapped_column(Float)
     prob_visitante: Mapped[float] = mapped_column(Float)
+
+    # Predicciones adicionales
+    over_under_pred: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "over", "under"
+    prob_over: Mapped[float | None] = mapped_column(Float, nullable=True)
+    prob_under: Mapped[float | None] = mapped_column(Float, nullable=True)
+    marcador_pred: Mapped[str | None] = mapped_column(String(10), nullable=True)  # "2-1", "1-0", etc
+    btts_pred: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    prob_btts: Mapped[float | None] = mapped_column(Float, nullable=True)
 
     resultado_real: Mapped[str | None] = mapped_column(String(20), nullable=True)
     acertada: Mapped[bool | None] = mapped_column(Boolean, nullable=True)

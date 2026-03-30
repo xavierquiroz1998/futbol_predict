@@ -41,6 +41,12 @@ class PrediccionResponse(BaseModel):
     prob_local: float
     prob_empate: float
     prob_visitante: float
+    over_under_pred: str | None = None
+    prob_over: float | None = None
+    prob_under: float | None = None
+    marcador_pred: str | None = None
+    btts_pred: bool | None = None
+    prob_btts: float | None = None
     resultado_real: str | None = None
     acertada: bool | None = None
     creada_en: datetime

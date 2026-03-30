@@ -121,19 +121,20 @@ El modelo utiliza **49 features** organizados en 7 categorias:
 ### Partidos
 | Metodo | Ruta | Descripcion |
 |--------|------|-------------|
-| `GET` | `/api/partidos/hoy` | Partidos de hoy (Football-Data.org + BD) |
-| `GET` | `/api/partidos/fecha/{fecha}` | Partidos por fecha |
+| `GET` | `/api/partidos/ligas` | Ligas y paises disponibles para filtrar |
+| `GET` | `/api/partidos/hoy?liga=X&pais=Y` | Partidos de hoy con filtros opcionales |
+| `GET` | `/api/partidos/fecha/{fecha}?liga=X&pais=Y` | Partidos por fecha con filtros |
 | `POST` | `/api/partidos/sincronizar/{fecha}` | Sincronizar partidos internacionales (TheSportsDB) |
-| `GET` | `/api/partidos/{api_id}` | Detalle de partido con estadisticas |
+| `GET` | `/api/partidos/{api_id}` | Detalle de partido con estadisticas y contexto |
 | `GET` | `/api/partidos/{api_id}/resultado` | Resultado de partido finalizado |
 
 ### Predicciones
 | Metodo | Ruta | Descripcion |
 |--------|------|-------------|
-| `POST` | `/api/predicciones/{partido_api_id}` | Generar prediccion |
+| `POST` | `/api/predicciones/{partido_api_id}` | Generar prediccion (resultado + over/under + BTTS + marcador) |
 | `POST` | `/api/predicciones/{partido_api_id}/verificar` | Verificar prediccion |
 | `POST` | `/api/predicciones/actualizar-resultados` | Actualizar resultados y verificar pendientes |
-| `GET` | `/api/predicciones/historial` | Historial de predicciones |
+| `GET` | `/api/predicciones/historial` | Historial de predicciones con datos de partidos |
 | `GET` | `/api/predicciones/estadisticas` | Estadisticas de acierto |
 
 ## Instalacion
@@ -212,24 +213,36 @@ npx vite --port 5174
 
 > Nota: El azar en prediccion de 3 clases (local/empate/visitante) es ~33%. Un 47% es un rendimiento razonable para un modelo basado solo en datos historicos de resultados sin datos adicionales como alineaciones, lesiones o mercado de apuestas.
 
+## Tipos de prediccion
+
+La app genera 4 predicciones por partido:
+
+| Prediccion | Descripcion |
+|------------|-------------|
+| **Resultado** | Gana local, empate o gana visitante con probabilidades |
+| **Marcador** | Marcador exacto mas probable (ej: 2-1) |
+| **Over/Under 2.5** | Si habra mas o menos de 2.5 goles totales |
+| **BTTS** | Si ambos equipos anotaran (Both Teams To Score) |
+
 ## Uso
 
 1. **Ver partidos**: La pagina principal muestra los partidos del dia
-2. **Seleccionar fecha**: Usa el selector de fecha para ver partidos de otros dias
-3. **Generar prediccion**: Click en un partido y pulsa "Generar prediccion"
-4. **Ver analisis**: Estadisticas comparativas, forma reciente, rachas, H2H y nivel de confianza
-5. **Verificar resultados**: En el historial, pulsa "Actualizar resultados" para verificar predicciones pendientes
-6. **Estadisticas**: Dashboard con porcentaje de acierto global
+2. **Filtrar**: Usa el boton "Filtros" para buscar por pais o liga, o usa los chips rapidos (Premier League, La Liga, etc.)
+3. **Seleccionar fecha**: Usa el selector de fecha para ver partidos de otros dias
+4. **Generar prediccion**: Click en un partido y pulsa "Generar prediccion"
+5. **Ver analisis**: Estadisticas comparativas, forma reciente (V/E/D), rachas, H2H, marcador predicho, over/under y BTTS
+6. **Verificar resultados**: En el historial, pulsa "Actualizar resultados" para verificar predicciones pendientes
+7. **Estadisticas**: Dashboard con porcentaje de acierto global
 
 ## Mejoras futuras
 
-- [ ] Agregar datos de alineaciones y lesiones
-- [ ] Prediccion de marcador exacto y over/under
+- [x] ~~Prediccion de marcador exacto y over/under~~ (implementado)
+- [x] ~~Filtros por liga y pais~~ (implementado)
 - [ ] Notificaciones de partidos proximos
-- [ ] Filtros por liga y pais
 - [ ] Docker Compose para deploy
 - [ ] Deploy en Railway/Render (backend) + Vercel (frontend)
 - [ ] Datos de cuotas de apuestas como feature adicional
+- [ ] Datos de alineaciones y lesiones en tiempo real
 
 ## Autor
 
