@@ -84,7 +84,32 @@ class ContextoPrediccionResponse(BaseModel):
     h2h_ultimos: list[str]  # ej: ["Local 2-1", "Empate 1-1", ...]
 
 
+class CuotaCasaResponse(BaseModel):
+    casa: str
+    local: float | None = None
+    empate: float | None = None
+    visitante: float | None = None
+
+
+class CuotasMediaResponse(BaseModel):
+    local: float | None = None
+    empate: float | None = None
+    visitante: float | None = None
+    prob_local: float | None = None
+    prob_empate: float | None = None
+    prob_visitante: float | None = None
+    over: float | None = None
+    under: float | None = None
+
+
+class CuotasResponse(BaseModel):
+    casas: list[CuotaCasaResponse] = []
+    media: CuotasMediaResponse | None = None
+    total_casas: int = 0
+
+
 class PartidoConPrediccionResponse(BaseModel):
     partido: PartidoResponse
     prediccion: PrediccionResponse | None = None
     contexto: ContextoPrediccionResponse | None = None
+    cuotas: CuotasResponse | None = None

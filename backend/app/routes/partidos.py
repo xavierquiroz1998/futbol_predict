@@ -17,6 +17,7 @@ from app.schemas.partido import (
     PrediccionResponse,
 )
 from app.services.contexto_service import generar_contexto
+from app.services.odds_service import odds_service
 from app.services.partido_service import (
     obtener_partido_por_api_id,
     obtener_partidos_por_fecha_db,
@@ -132,10 +133,22 @@ async def obtener_partido(api_id: int, db: Session = Depends(get_db)):
 
     contexto = generar_contexto(db, partido)
 
+    # Obtener cuotas de apuestas
+    cuotas_data = None
+    if not partido.finalizado:
+        try:
+            cuotas_data = await odds_service.obtener_cuotas_partido(
+                db, partido.api_id, partido.liga_nombre,
+                partido.equipo_local_nombre, partido.equipo_visitante_nombre,
+            )
+        except Exception as e:
+            logger.warning(f"Error obteniendo cuotas: {e}")
+
     return PartidoConPrediccionResponse(
         partido=PartidoResponse.model_validate(partido),
         prediccion=PrediccionResponse.model_validate(prediccion) if prediccion else None,
         contexto=contexto,
+        cuotas=cuotas_data,
     )
 
 

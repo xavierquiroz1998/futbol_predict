@@ -69,3 +69,20 @@ class Prediccion(Base):
     acertada: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
     creada_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+
+class Cuota(Base):
+    __tablename__ = "cuotas"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    partido_api_id: Mapped[int] = mapped_column(Integer, index=True)
+    casa: Mapped[str] = mapped_column(String(100))  # "pinnacle", "bet365", etc.
+    mercado: Mapped[str] = mapped_column(String(50))  # "h2h", "totals", "btts"
+
+    cuota_local: Mapped[float | None] = mapped_column(Float, nullable=True)
+    cuota_empate: Mapped[float | None] = mapped_column(Float, nullable=True)
+    cuota_visitante: Mapped[float | None] = mapped_column(Float, nullable=True)
+    cuota_over: Mapped[float | None] = mapped_column(Float, nullable=True)
+    cuota_under: Mapped[float | None] = mapped_column(Float, nullable=True)
+
+    actualizada_en: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

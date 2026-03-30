@@ -185,7 +185,7 @@ export default function DetallePartido() {
   if (error && !data) return <ErrorMsg mensaje={error} onReintentar={cargar} />
   if (!data) return null
 
-  const { partido: p, prediccion: pred, contexto: ctx } = data
+  const { partido: p, prediccion: pred, contexto: ctx, cuotas } = data
   const fecha = new Date(p.fecha)
   const analisis = pred ? getAnalisis(pred, ctx, p.equipo_local_nombre, p.equipo_visitante_nombre) : null
 
@@ -274,7 +274,83 @@ export default function DetallePartido() {
           </div>
         )}
 
-        {/* Predicción */}
+        {/* Cuotas de apuestas */}
+        {cuotas && cuotas.total_casas > 0 && (
+          <div className="px-6 py-5 border-t border-gray-700">
+            <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
+              Cuotas de apuestas <span className="text-xs text-gray-600 normal-case">({cuotas.total_casas} casas)</span>
+            </h3>
+
+            {cuotas.media && (
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-green-900/20 border border-green-800/50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-400">{p.equipo_local_nombre}</p>
+                  <p className="text-2xl font-black text-green-400">{cuotas.media.local}</p>
+                  <p className="text-xs text-gray-500">{cuotas.media.prob_local}%</p>
+                </div>
+                <div className="bg-yellow-900/20 border border-yellow-800/50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-400">Empate</p>
+                  <p className="text-2xl font-black text-yellow-400">{cuotas.media.empate}</p>
+                  <p className="text-xs text-gray-500">{cuotas.media.prob_empate}%</p>
+                </div>
+                <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-400">{p.equipo_visitante_nombre}</p>
+                  <p className="text-2xl font-black text-blue-400">{cuotas.media.visitante}</p>
+                  <p className="text-xs text-gray-500">{cuotas.media.prob_visitante}%</p>
+                </div>
+              </div>
+            )}
+
+            {cuotas.media?.over && (
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-2 text-center">
+                  <p className="text-xs text-gray-400">Over 2.5</p>
+                  <p className="text-lg font-bold text-gray-200">{cuotas.media.over}</p>
+                </div>
+                <div className="bg-gray-700/30 border border-gray-600 rounded-lg p-2 text-center">
+                  <p className="text-xs text-gray-400">Under 2.5</p>
+                  <p className="text-lg font-bold text-gray-200">{cuotas.media.under}</p>
+                </div>
+              </div>
+            )}
+
+            <details className="group">
+              <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-300 transition-colors">
+                Ver detalle por casa de apuestas
+              </summary>
+              <div className="mt-2 bg-gray-900/50 rounded-lg border border-gray-700 overflow-hidden">
+                <table className="w-full text-xs">
+                  <thead className="bg-gray-900/80">
+                    <tr>
+                      <th className="px-3 py-2 text-left text-gray-500">Casa</th>
+                      <th className="px-3 py-2 text-center text-gray-500">1</th>
+                      <th className="px-3 py-2 text-center text-gray-500">X</th>
+                      <th className="px-3 py-2 text-center text-gray-500">2</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-800">
+                    {cuotas.casas.map((c, i) => (
+                      <tr key={i} className="hover:bg-gray-800/50">
+                        <td className="px-3 py-1.5 text-gray-400">{c.casa}</td>
+                        <td className="px-3 py-1.5 text-center text-gray-300">{c.local}</td>
+                        <td className="px-3 py-1.5 text-center text-gray-300">{c.empate}</td>
+                        <td className="px-3 py-1.5 text-center text-gray-300">{c.visitante}</td>
+                      </tr>
+                    ))}
+                    <tr className="bg-gray-800/80 font-semibold">
+                      <td className="px-3 py-1.5 text-gray-300">Media</td>
+                      <td className="px-3 py-1.5 text-center text-green-400">{cuotas.media?.local}</td>
+                      <td className="px-3 py-1.5 text-center text-yellow-400">{cuotas.media?.empate}</td>
+                      <td className="px-3 py-1.5 text-center text-blue-400">{cuotas.media?.visitante}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        )}
+
+        {/* Prediccion */}
         <div className="px-6 py-6 border-t border-gray-700 bg-gray-900/50">
           <h3 className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-wide">Prediccion</h3>
 

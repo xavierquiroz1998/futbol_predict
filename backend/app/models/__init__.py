@@ -1,3 +1,3 @@
-from app.models.partido import Equipo, Partido, Prediccion
+from app.models.partido import Cuota, Equipo, Partido, Prediccion
 
-__all__ = ["Equipo", "Partido", "Prediccion"]
+__all__ = ["Cuota", "Equipo", "Partido", "Prediccion"]
