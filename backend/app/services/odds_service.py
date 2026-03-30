@@ -219,4 +219,28 @@ class OddsService:
         return resultado
 
 
+    def calcular_cuotas_estimadas(self, prob_local: float, prob_empate: float, prob_visitante: float) -> dict:
+        """Calcula cuotas estimadas a partir de las probabilidades del modelo ML.
+        Se usa como fallback cuando no hay cuotas reales disponibles."""
+        margin = 1.05  # Margen típico de casa de apuestas (5%)
+
+        cuota_local = round(margin / max(prob_local, 0.01), 2)
+        cuota_empate = round(margin / max(prob_empate, 0.01), 2)
+        cuota_visitante = round(margin / max(prob_visitante, 0.01), 2)
+
+        return {
+            "casas": [],
+            "media": {
+                "local": cuota_local,
+                "empate": cuota_empate,
+                "visitante": cuota_visitante,
+                "prob_local": round(prob_local * 100, 1),
+                "prob_empate": round(prob_empate * 100, 1),
+                "prob_visitante": round(prob_visitante * 100, 1),
+            },
+            "total_casas": 0,
+            "estimadas": True,
+        }
+
+
 odds_service = OddsService()

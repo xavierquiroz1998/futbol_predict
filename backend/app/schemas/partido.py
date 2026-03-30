@@ -106,6 +106,7 @@ class CuotasResponse(BaseModel):
     casas: list[CuotaCasaResponse] = []
     media: CuotasMediaResponse | None = None
     total_casas: int = 0
+    estimadas: bool = False
 
 
 class PartidoConPrediccionResponse(BaseModel):

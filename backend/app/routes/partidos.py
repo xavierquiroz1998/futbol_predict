@@ -144,6 +144,12 @@ async def obtener_partido(api_id: int, db: Session = Depends(get_db)):
         except Exception as e:
             logger.warning(f"Error obteniendo cuotas: {e}")
 
+        # Fallback: cuotas estimadas del modelo si hay predicción y no hay cuotas reales
+        if not cuotas_data and prediccion:
+            cuotas_data = odds_service.calcular_cuotas_estimadas(
+                prediccion.prob_local, prediccion.prob_empate, prediccion.prob_visitante,
+            )
+
     return PartidoConPrediccionResponse(
         partido=PartidoResponse.model_validate(partido),
         prediccion=PrediccionResponse.model_validate(prediccion) if prediccion else None,

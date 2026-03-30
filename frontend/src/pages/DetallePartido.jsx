@@ -275,10 +275,12 @@ export default function DetallePartido() {
         )}
 
         {/* Cuotas de apuestas */}
-        {cuotas && cuotas.total_casas > 0 && (
+        {cuotas && cuotas.media && (
           <div className="px-6 py-5 border-t border-gray-700">
             <h3 className="text-sm font-semibold text-gray-400 mb-3 uppercase tracking-wide">
-              Cuotas de apuestas <span className="text-xs text-gray-600 normal-case">({cuotas.total_casas} casas)</span>
+              {cuotas.estimadas ? 'Cuotas estimadas' : 'Cuotas de apuestas'}
+              {cuotas.total_casas > 0 && <span className="text-xs text-gray-600 normal-case"> ({cuotas.total_casas} casas)</span>}
+              {cuotas.estimadas && <span className="text-xs text-yellow-500 normal-case ml-2">basadas en el modelo ML</span>}
             </h3>
 
             {cuotas.media && (
