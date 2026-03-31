@@ -14,8 +14,8 @@ router = APIRouter()
 
 
 @router.post("/{partido_api_id}", response_model=PrediccionResponse)
-def crear_prediccion(partido_api_id: int, db: Session = Depends(get_db)):
-    """Genera una predicción para un partido usando el modelo ML."""
+async def crear_prediccion(partido_api_id: int, db: Session = Depends(get_db)):
+    """Genera una predicción buscando historial on-demand antes de predecir."""
     partido = obtener_partido_por_api_id(db, partido_api_id)
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
@@ -33,6 +33,8 @@ def crear_prediccion(partido_api_id: int, db: Session = Depends(get_db)):
         return PrediccionResponse.model_validate(existente)
 
     try:
+        # Buscar historial de ambos equipos antes de predecir
+        await predictor.buscar_historial_si_necesario(db, partido)
         pred = predictor.predecir_partido(db, partido)
     except FileNotFoundError as e:
         raise HTTPException(status_code=503, detail=str(e))

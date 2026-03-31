@@ -72,6 +72,11 @@ function getAnalisis(pred, ctx, equipoLocal, equipoVisitante) {
 
   let partes = []
 
+  if (pred.sin_datos) {
+    partes.push(`No se encontraron datos historicos de estos equipos en la base de datos. La prediccion se basa en la ventaja local promedio del futbol y no es especifica para este partido.`)
+    return { nivel: { texto: 'Sin datos', color: 'text-orange-400', bgColor: 'bg-orange-900/30 border-orange-700', icono: '⚠' }, descripcion: partes.join(' '), diff }
+  }
+
   if (ctx) {
     const l = ctx.local
     const v = ctx.visitante

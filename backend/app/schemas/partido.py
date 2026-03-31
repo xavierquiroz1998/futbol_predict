@@ -47,6 +47,7 @@ class PrediccionResponse(BaseModel):
     marcador_pred: str | None = None
     btts_pred: bool | None = None
     prob_btts: float | None = None
+    sin_datos: bool = False
     resultado_real: str | None = None
     acertada: bool | None = None
     creada_en: datetime

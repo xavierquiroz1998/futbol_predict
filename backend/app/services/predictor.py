@@ -20,6 +20,7 @@ from app.ml.features import (
     obtener_partidos_como_df,
 )
 from app.models.partido import Partido, Prediccion
+from app.services.historial_service import obtener_historial_equipo
 
 MODEL_DIR = Path(__file__).parent.parent / "ml"
 MODEL_PATH = MODEL_DIR / "model.pkl"
@@ -59,6 +60,10 @@ class PredictorService:
 
         forma_local_5 = _forma_reciente(df, local_id, fecha, n=5)
         forma_visitante_5 = _forma_reciente(df, visitante_id, fecha, n=5)
+
+        # Verificar si hay datos suficientes
+        self._datos_suficientes = forma_local_5["partidos"] >= 1 and forma_visitante_5["partidos"] >= 1
+
         forma_local_10 = _forma_reciente(df, local_id, fecha, n=10)
         forma_visitante_10 = _forma_reciente(df, visitante_id, fecha, n=10)
         racha_local = _racha_actual(df, local_id, fecha)
@@ -182,27 +187,41 @@ class PredictorService:
 
         return f"{gl}-{gv}"
 
+    async def buscar_historial_si_necesario(self, db: Session, partido: Partido):
+        """Busca historial de ambos equipos si no tenemos datos suficientes."""
+        await obtener_historial_equipo(db, partido.equipo_local_api_id)
+        await obtener_historial_equipo(db, partido.equipo_visitante_api_id)
+
     def predecir_partido(self, db: Session, partido: Partido) -> Prediccion:
         """Genera predicción completa: resultado, over/under, BTTS, marcador."""
         self._cargar_modelo()
+        self._datos_suficientes = True
 
         features = self._calcular_features(db, partido)
 
-        # Predicción de resultado
-        proba = self._model.predict_proba(features)[0]
-        clase_idx = np.argmax(proba)
-        prediccion_label = self._encoder.inverse_transform([clase_idx])[0]
+        if not self._datos_suficientes:
+            # Sin datos históricos: usar distribución base del fútbol
+            # Fuente: ventaja local promedio histórica global
+            pl, pe, pv = 0.45, 0.27, 0.28
+            prediccion_label = "local"
+            over_pred, prob_over, prob_under = "under", 0.45, 0.55
+            btts_pred, prob_btts = True, 0.52
+            marcador = "1-0"
+        else:
+            # Predicción con el modelo ML
+            proba = self._model.predict_proba(features)[0]
+            clase_idx = np.argmax(proba)
+            prediccion_label = self._encoder.inverse_transform([clase_idx])[0]
 
-        clases = self._encoder.classes_
-        prob_dict = dict(zip(clases, proba))
-        pl = float(prob_dict.get("local", 0))
-        pe = float(prob_dict.get("empate", 0))
-        pv = float(prob_dict.get("visitante", 0))
+            clases = self._encoder.classes_
+            prob_dict = dict(zip(clases, proba))
+            pl = float(prob_dict.get("local", 0))
+            pe = float(prob_dict.get("empate", 0))
+            pv = float(prob_dict.get("visitante", 0))
 
-        # Predicciones adicionales
-        over_pred, prob_over, prob_under = self._predecir_over_under()
-        btts_pred, prob_btts = self._predecir_btts()
-        marcador = self._predecir_marcador(pl, pe, pv)
+            over_pred, prob_over, prob_under = self._predecir_over_under()
+            btts_pred, prob_btts = self._predecir_btts()
+            marcador = self._predecir_marcador(pl, pe, pv)
 
         pred = Prediccion(
             partido_api_id=partido.api_id,
@@ -216,6 +235,7 @@ class PredictorService:
             marcador_pred=marcador,
             btts_pred=btts_pred,
             prob_btts=prob_btts,
+            sin_datos=not self._datos_suficientes,
             creada_en=datetime.utcnow(),
         )
 

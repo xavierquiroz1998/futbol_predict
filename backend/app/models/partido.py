@@ -65,6 +65,8 @@ class Prediccion(Base):
     btts_pred: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     prob_btts: Mapped[float | None] = mapped_column(Float, nullable=True)
 
+    sin_datos: Mapped[bool] = mapped_column(Boolean, default=False)
+
     resultado_real: Mapped[str | None] = mapped_column(String(20), nullable=True)
     acertada: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
 
